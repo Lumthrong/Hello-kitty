@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Kitty</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  background:linear-gradient(rgba(255,214,236,.6),rgba(230,223,255,.6)),url("bg.jpg") center/cover no-repeat fixed;
+}
+
+/* KITTY AREA */
+.kitty-area{
+  margin-top:180px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* KITTY */
+.kitty{
+  width:220px;
+  cursor:pointer;
+  animation:float 3s ease-in-out infinite;
+  transition:opacity .35s ease; /* fade transition */
+  opacity:1;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+
+/* BUBBLE */
+.bubble{
+  position:absolute;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+  padding:22px 32px;
+  background:#fff;
+  color:#f851c6;
+  border-radius:40px;
+  display:none;
+  width:clamp(260px,80vw,520px);
+  text-align:center;
+}
+
+/* controls */
+.controls{margin-top:12px;display:flex;gap:10px;}
+input{padding:14px;border-radius:18px;border:none;width:260px;}
+button{padding:14px 20px;border-radius:18px;border:none;background:#ff6bb0;color:white;cursor:pointer;}
+
+.panel{
+  margin-top:20px;
+  width:320px;
+  background:rgba(255,214,235,.6);
+  padding:20px;
+  border-radius:24px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+/* bars */
+.bar{background:#fff;border-radius:16px;padding:5px;overflow:hidden;}
+.fill{height:14px;border-radius:16px;background:#ff6bb0;width:0;}
+.fill.hunger{background:#ff8a4c;}
+.fill.fun{background:#4cd6ff;}
+.fill.social{background:#b94cff;}
+
+.mood{margin-top:8px;font-weight:600;font-size:18px;color:#ff3fa4;}
+</style>
+</head>
+
+<body>
+
+<div class="kitty-area">
+  <div class="bubble" id="bubble"></div>
+  <img src="default.gif" class="kitty" id="kitty">
+</div>
+
+<div class="controls">
+<input type="text" id="input">
+<button onclick="sendMessage()">Send</button>
+</div>
+
+<div class="mood">Mood: <span id="mood">😐 Neutral</span></div>
+<div class="mood">Hearts: <span id="score">5</span> ❤️</div>
+
+<div class="panel">
+<div>Level: <span id="level">1</span></div>
+<div class="bar">❤️ XP<div class="fill" id="xpBar"></div></div>
+<div class="bar">🍰 Hunger<div class="fill hunger" id="hungerBar"></div></div>
+<div class="bar">🎮 Fun<div class="fill fun" id="funBar"></div></div>
+<div class="bar">💬 Social<div class="fill social" id="socialBar"></div></div>
+<button onclick="feed()">Feed 🍰</button>
+</div>
+
+<script>
+let state = JSON.parse(localStorage.getItem("kittyState")) || {
+  hearts:5,hunger:60,fun:60,social:60,xp:0,level:1,
+  relationship:50,mood:"neutral",lastInteraction:Date.now()
+};
+
+const bubble=document.getElementById("bubble");
+const kitty=document.getElementById("kitty");
+
+/* GIF STATES */
+const gifs={
+  idle:"default.gif",
+  happy:"happy.gif",
+  sleepy:"costume1.gif",
+  clingy:"sad.png",
+  bored:"bored.gif",
+  excited:"happy.gif",
+  level3:"costume1.gif",
+  level5:"pajamas.gif",
+  level8:"princess.gif"
+};
+
+function setGif(name){
+  if(!gifs[name]) return;
+
+  const newGif = gifs[name];
+
+  // preload image
+  const img = new Image();
+  img.src = newGif;
+
+  // fade out
+  kitty.style.opacity = 0;
+
+  setTimeout(()=>{
+    kitty.src = "";
+    kitty.src = newGif;   // swap
+    kitty.style.opacity = 1; // fade in
+  },300);
+}
+
+function save(){localStorage.setItem("kittyState",JSON.stringify(state));}
+
+function clamp(){
+  state.hunger=Math.max(0,Math.min(100,state.hunger));
+  state.fun=Math.max(0,Math.min(100,state.fun));
+  state.social=Math.max(0,Math.min(100,state.social));
+}
+
+function updateMood(type){
+  state.mood=type;
+  const moods={
+    happy:"😸 Happy",
+    annoyed:"😾 Annoyed",
+    clingy:"🥺 Clingy",
+    sleepy:"😴 Sleepy",
+    bored:"😿 Bored",
+    excited:"🤩 Excited",
+    neutral:"😐 Neutral"
+  };
+  document.getElementById("mood").innerText=moods[type]||type;
+
+  if(type==="happy") setGif("happy");
+  if(type==="clingy") setGif("clingy");
+  if(type==="sleepy") setGif("sleepy");
+  if(type==="bored") setGif("bored");
+  if(type==="excited") setGif("excited");
+  if(type==="neutral") setGif("idle");
+}
+
+function showBubble(text){
+  bubble.innerText=text;
+  bubble.style.display="block";
+}
+
+function updateBars(){
+  document.getElementById("xpBar").style.width=state.xp+"%";
+  document.getElementById("hungerBar").style.width=state.hunger+"%";
+  document.getElementById("funBar").style.width=state.fun+"%";
+  document.getElementById("socialBar").style.width=state.social+"%";
+  document.getElementById("score").innerText=state.hearts;
+  document.getElementById("level").innerText=state.level;
+}
+setInterval(updateBars,300);
+
+function addXP(a){
+  state.xp+=a;
+  if(state.xp>=100){
+    state.xp=0;
+    state.level++;
+    showBubble("Level up 💕");
+
+    if(state.level>=8) setGif("level8");
+    else if(state.level>=5) setGif("level5");
+    else if(state.level>=3) setGif("level3");
+
+    setTimeout(()=>setGif("idle"),3000);
+  }
+}
+
+setInterval(()=>{
+  state.hunger-=2;
+  state.fun-=1;
+  state.social-=1;
+  clamp();
+
+  if(state.hunger<20) updateMood("annoyed");
+  else if(state.social<30) updateMood("clingy");
+  else if(state.fun<20) updateMood("bored");
+  else if(state.fun>70 && state.social>70) updateMood("happy");
+  else updateMood("neutral");
+
+  save();
+},8000);
+
+function feed(){
+  if(state.hearts<=0){showBubble("Need hearts 💔");return;}
+  state.hearts--;
+  state.hunger+=20;
+  clamp();
+
+  setGif("eat");
+  updateMood("happy");
+  showBubble("Yummy 🍰");
+
+  setTimeout(()=>setGif("idle"),2500);
+  save();
+}
+
+kitty.onclick=()=>{
+  state.hearts++;
+  state.fun+=6;
+  state.social+=4;
+  clamp();
+
+  setGif("happy");
+  addXP(10);
+  updateMood("excited");
+  state.lastInteraction=Date.now();
+
+  setTimeout(()=>setGif("idle"),2000);
+  save();
+};
+
+setInterval(()=>{
+  if(Date.now()-state.lastInteraction>25000){
+    updateMood("clingy");
+    showBubble("I miss you 🥺");
+  }
+},25000);
+
+setInterval(()=>{
+  const h=new Date().getHours();
+  if(h>=23||h<6){
+    updateMood("sleepy");
+    showBubble("Zzz dreaming 💭");
+  }
+},60000);
+
+async function sendMessage(){
+  const input=document.getElementById("input");
+  const text=input.value;
+  if(!text)return;
+  input.value="";
+  state.lastInteraction=Date.now();
+
+  showBubble("Thinking...");
+
+  try{
+    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:text,mood:state.mood,relationship:state.relationship})});
+    const d=await r.json();
+
+    showBubble(d.reply);
+
+    state.social+=6;
+    state.fun+=4;
+    state.relationship+=2;
+    clamp();
+
+    addXP(5);
+    save();
+  }catch{showBubble("AI error");}
+}
+</script>
+</body>
+</html>
