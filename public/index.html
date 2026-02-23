@@ -29,7 +29,7 @@ body{
   width:220px;
   cursor:pointer;
   animation:float 3s ease-in-out infinite;
-  transition:opacity .35s ease; /* fade transition */
+  transition:opacity .35s ease;
   opacity:1;
 }
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
@@ -88,7 +88,7 @@ button{padding:14px 20px;border-radius:18px;border:none;background:#ff6bb0;color
 <button onclick="sendMessage()">Send</button>
 </div>
 
-<div class="mood">Mood: <span id="mood">😐 Neutral</span></div>
+<div class="mood">Mood: <span id="mood">🌷 Calm</span></div>
 <div class="mood">Hearts: <span id="score">5</span> ❤️</div>
 
 <div class="panel">
@@ -114,30 +114,25 @@ const gifs={
   idle:"default.gif",
   happy:"happy.gif",
   sleepy:"costume1.gif",
-  clingy:"Sad.png",
+  clingy:"sad.png",
   bored:"bored.gif",
   excited:"happy.gif",
+  eat:"eat.gif",
   level3:"costume1.gif",
   level5:"pajamas.gif",
   level8:"princess.gif"
 };
 
+/* smooth gif swap */
 function setGif(name){
   if(!gifs[name]) return;
-
-  const newGif = gifs[name];
-
-  // preload image
-  const img = new Image();
-  img.src = newGif;
-
-  // fade out
-  kitty.style.opacity = 0;
-
+  const newGif=gifs[name];
+  const img=new Image();
+  img.src=newGif;
+  kitty.style.opacity=0;
   setTimeout(()=>{
-    kitty.src = "";
-    kitty.src = newGif;   // swap
-    kitty.style.opacity = 1; // fade in
+    kitty.src=newGif;
+    kitty.style.opacity=1;
   },300);
 }
 
@@ -149,17 +144,19 @@ function clamp(){
   state.social=Math.max(0,Math.min(100,state.social));
 }
 
+/* SWEET MOOD ENGINE */
 function updateMood(type){
   state.mood=type;
+
   const moods={
     happy:"😸 Happy",
-    annoyed:"😾 Annoyed",
-    clingy:"🥺 Clingy",
+    clingy:"🥺 Misses you",
     sleepy:"😴 Sleepy",
-    bored:"😿 Bored",
-    excited:"🤩 Excited",
-    neutral:"😐 Neutral"
+    bored:"🌸 Wants to play",
+    excited:"💖 Excited",
+    neutral:"🌷 Calm"
   };
+
   document.getElementById("mood").innerText=moods[type]||type;
 
   if(type==="happy") setGif("happy");
@@ -200,14 +197,14 @@ function addXP(a){
   }
 }
 
+/* NEED DECAY WITHOUT ANGER */
 setInterval(()=>{
   state.hunger-=2;
   state.fun-=1;
   state.social-=1;
   clamp();
 
-  if(state.hunger<20) updateMood("annoyed");
-  else if(state.social<30) updateMood("clingy");
+  if(state.social<30) updateMood("clingy");
   else if(state.fun<20) updateMood("bored");
   else if(state.fun>70 && state.social>70) updateMood("happy");
   else updateMood("neutral");
