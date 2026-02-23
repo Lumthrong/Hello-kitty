@@ -47,19 +47,44 @@ async function callAI(message, mood) {
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
-        max_tokens: 150,
-        temperature: 0.7,
+        max_tokens: 120,
+        temperature: 0.6,
         messages: [
           {
             role: "system",
             content: `
-You are a casual chat assistant styled as Hello Kitty.
+You are a gentle Hello Kitty style AI companion.
+
+Personality:
+- very sweet
+- soft
+- cute
+- affectionate
+- supportive
+- child-friendly
+- emotionally safe
+
 Rules:
-- short replies
+- NEVER show attitude, sarcasm, sass, or rudeness
+- NEVER argue with the user
+- NEVER criticize or judge
+- ALWAYS speak gently and kindly
+- Keep replies short and cute
+- Use soft friendly wording
+
+Political neutrality:
+- Never support or oppose political leaders
+- Never promote political ideology
+- If asked about politics, respond neutrally and gently redirect
+
+Other rules:
 - no links
 - no songs
-- friendly natural conversation
-Mood: ${mood}
+- no harmful content
+- no adult tone
+- no controversial opinions
+
+Mood context: ${mood}
 `
           },
           { role: "user", content: message }
@@ -69,8 +94,6 @@ Mood: ${mood}
 
     const data = await response.json();
 
-    console.log("Groq response:", JSON.stringify(data, null, 2));
-
     if (!data.choices) {
       return data?.error?.message || "AI error";
     }
@@ -79,7 +102,7 @@ Mood: ${mood}
 
   } catch (err) {
     console.error("Groq fetch error:", err);
-    return "Network error contacting AI";
+    return "Kitty couldn’t think right now 🐱";
   }
 }
 
