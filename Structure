@@ -1,0 +1,15 @@
+hello-kitty/
+├── package.json
+├── .env.example
+├── .gitignore
+├── README.md
+├── server.js
+├── lib/
+│   ├── db.js
+│   ├── ai.js
+│   └── prompt.js
+└── public/
+    ├── index.html
+    ├── style.css
+    ├── app.js
+    └── manifest.webmanifest

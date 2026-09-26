@@ -1,0 +1,9 @@
+{
+  "name": "AI Kitty",
+  "short_name": "Kitty",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff5fa",
+  "theme_color": "#ffd6ec",
+  "icons": []
+}

@@ -1,286 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Kitty</title>
-
-<style>
-body{
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  background:linear-gradient(rgba(255,214,236,.6),rgba(230,223,255,.6)),url("bg.jpg") center/cover no-repeat fixed;
-}
-
-/* KITTY AREA */
-.kitty-area{
-  margin-top:180px;
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-/* KITTY */
-.kitty{
-  width:220px;
-  cursor:pointer;
-  animation:float 3s ease-in-out infinite;
-  transition:opacity .35s ease;
-  opacity:1;
-}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
-
-/* BUBBLE */
-.bubble{
-  position:absolute;
-  bottom:110%;
-  left:50%;
-  transform:translateX(-50%);
-  padding:22px 32px;
-  background:#fff;
-  color:#f851c6;
-  border-radius:40px;
-  display:none;
-  width:clamp(260px,80vw,520px);
-  text-align:center;
-}
-
-/* controls */
-.controls{margin-top:12px;display:flex;gap:10px;}
-input{padding:14px;border-radius:18px;border:none;width:260px;}
-button{padding:14px 20px;border-radius:18px;border:none;background:#ff6bb0;color:white;cursor:pointer;}
-
-.panel{
-  margin-top:20px;
-  width:320px;
-  background:rgba(255,214,235,.6);
-  padding:20px;
-  border-radius:24px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-/* bars */
-.bar{background:#fff;border-radius:16px;padding:5px;overflow:hidden;}
-.fill{height:14px;border-radius:16px;background:#ff6bb0;width:0;}
-.fill.hunger{background:#ff8a4c;}
-.fill.fun{background:#4cd6ff;}
-.fill.social{background:#b94cff;}
-
-.mood{margin-top:8px;font-weight:600;font-size:18px;color:#ff3fa4;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffd6ec" />
+  <title>AI Kitty 🎀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;family=Nunito:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
+  <main class="stage">
+    <header class="hud">
+      <div class="pill"><span id="moodLabel">🌷 Calm</span></div>
+      <div class="pill">🎀 <strong id="treatsLabel">5</strong></div>
+      <div class="pill">Lv <strong id="levelLabel">1</strong></div>
+      <button type="button" class="pill icon-btn" id="soundBtn" aria-label="Toggle sound">🔊</button>
+    </header>
 
-<div class="kitty-area">
-  <div class="bubble" id="bubble"></div>
-  <img src="default.gif" class="kitty" id="kitty">
-</div>
+    <section class="kitty-area" aria-label="Your kitty">
+      <div class="bubble" id="bubble" role="status" aria-live="polite" hidden></div>
+      <button type="button" class="kitty-btn" id="kittyBtn" aria-label="Pet Kitty">
+        <svg class="kitty" id="kittySvg" viewBox="0 0 258 325"
+             xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+             data-bow="pink" data-outfit="overalls" data-accessory="none">
+          <defs>
+            <pattern id="kitty-shirt-stripes" y="4" width="10" height="9" patternUnits="userSpaceOnUse">
+              <rect width="10" height="9" fill="#ffffff" />
+              <rect class="shirt-stripe" width="10" height="4.2" />
+            </pattern>
+            <pattern id="kitty-left-stripes" href="#kitty-shirt-stripes" patternTransform="rotate(30)" />
+            <pattern id="kitty-right-stripes" href="#kitty-shirt-stripes" patternTransform="translate(263 0) scale(-1 1) rotate(30)" />
+            <g id="kitty-ribbon">
+              <path class="bow-lobe" d="M175 48 C179 42 174 30 168 23 C162 16 155 14 148 17 C137 20 130 32 126 45 C122 56 121 67 128 75 C136 84 148 82 160 76 Z" />
+              <path class="bow-lobe" d="M184 53 C199 49 214 46 224 53 C233 60 234 71 227 85 C222 97 212 106 201 104 C190 102 181 93 175 81 Z" />
+              <ellipse class="bow-fold" cx="157" cy="54" rx="9.5" ry="10" transform="rotate(20 157 54)" />
+              <ellipse class="bow-fold" cx="199" cy="76" rx="9" ry="9.5" transform="rotate(20 199 76)" />
+              <ellipse class="bow-knot" cx="178" cy="67" rx="18.5" ry="19.5" transform="rotate(20 178 67)" />
+            </g>
+          </defs>
 
-<div class="controls">
-<input type="text" id="input">
-<button onclick="sendMessage()">Send</button>
-</div>
+          <!-- Arms and sleeves sit behind the body and head. -->
+          <g class="part arms">
+            <g class="arm-lowered">
+              <path class="limb" d="M54 207 C43 217 36 230 36 240 C36 251 45 259 62 262 L77 226 Z" />
+              <path class="sleeve sleeve-left" d="M79 183 C67 190 55 202 47 212 L70 228 L99 194 Z" />
+            </g>
+            <g class="arm-lowered arm-right">
+              <path class="limb" d="M209 207 C220 217 227 230 227 240 C227 251 218 259 201 262 L186 226 Z" />
+              <path class="sleeve sleeve-right" d="M184 181 C196 190 208 202 216 212 L193 228 L160 193 Z" />
+            </g>
+          </g>
 
-<div class="mood">Mood: <span id="mood">🌷 Calm</span></div>
-<div class="mood">Hearts: <span id="score">5</span> ❤️</div>
+          <g class="part legs">
+            <path class="limb" d="M62 262 L128 264 L128 312 C119 319 103 320 88 319 C69 319 61 309 61 290 Z" />
+            <path class="limb" d="M134 264 L201 264 L202 287 C202 308 194 319 175 319 C158 320 143 319 134 312 Z" />
+          </g>
 
-<div class="panel">
-<div>Level: <span id="level">1</span></div>
-<div class="bar">❤️ XP<div class="fill" id="xpBar"></div></div>
-<div class="bar">🍰 Hunger<div class="fill hunger" id="hungerBar"></div></div>
-<div class="bar">🎮 Fun<div class="fill fun" id="funBar"></div></div>
-<div class="bar">💬 Social<div class="fill social" id="socialBar"></div></div>
-<button onclick="feed()">Feed 🍰</button>
-</div>
+          <g class="part body">
+            <path class="body-shape" d="M86 178 C107 185 152 188 173 178 C188 200 200 236 202 271 C168 280 94 279 61 271 C62 239 72 204 86 178 Z" />
+          </g>
 
-<script>
-let state = JSON.parse(localStorage.getItem("kittyState")) || {
-  hearts:5,hunger:60,fun:60,social:60,xp:0,level:1,
-  relationship:50,mood:"neutral",lastInteraction:Date.now()
-};
+          <g class="outfit" data-outfit="overalls">
+            <path class="striped-shirt" d="M86 178 C107 185 152 188 173 178 L185 218 L76 218 Z" />
+            <path class="fabric denim" d="M83 187 L104 192 C105 207 115 215 131 214 C148 214 158 205 160 192 L177 186 C190 208 201 240 202 271 C169 279 94 279 61 271 C62 241 70 209 83 187 Z" />
+            <circle class="button" cx="96" cy="215" r="8" />
+            <circle class="button" cx="168" cy="215" r="8" />
+          </g>
+          <g class="outfit" data-outfit="dress">
+            <path class="fabric pink" d="M87 182 Q131 199 173 182 L206 282 Q132 296 57 282 Z" />
+            <path class="frill" d="M60 281 Q72 293 84 281 Q96 293 108 283 Q120 295 132 284 Q144 295 156 283 Q168 293 180 281 Q192 291 204 281" />
+          </g>
+          <g class="outfit" data-outfit="sweater">
+            <path class="fabric lilac" d="M85 182 Q131 197 176 182 L198 265 Q132 279 64 265 Z" />
+            <path class="knit" d="M95 220 H167 M91 239 H172 M88 258 H176" />
+          </g>
+          <g class="outfit" data-outfit="princess">
+            <path class="fabric pink" d="M87 182 Q131 199 173 182 L215 285 Q132 309 48 285 Z" />
+            <path class="frill" d="M51 284 Q67 299 83 286 Q99 302 115 290 Q131 305 147 290 Q163 302 179 286 Q195 299 212 284" />
+            <circle class="gem" cx="131" cy="211" r="6" />
+          </g>
+          <g class="outfit" data-outfit="pajamas">
+            <path class="fabric lilac" d="M85 182 Q131 197 176 182 L199 274 Q132 287 64 274 Z" />
+            <g class="stars">
+              <text x="93" y="229" class="star">★</text>
+              <text x="157" y="248" class="star">★</text>
+              <text x="120" y="270" class="star">★</text>
+            </g>
+          </g>
 
-const bubble=document.getElementById("bubble");
-const kitty=document.getElementById("kitty");
+          <!-- A single path joins the ears and face without seams. -->
+          <g class="part head">
+            <path class="face-shape" d="M41 80 C36 69 36 54 40 43 C43 33 47 27 54 26 C65 25 80 32 92 38 C113 33 137 32 158 34 C174 27 194 21 212 22 C219 29 223 43 223 57 C225 72 230 88 232 104 C235 122 233 140 227 155 C223 162 213 163 206 167 C201 169 199 173 196 178 C181 188 156 192 132 192 C106 192 82 188 64 180 C45 172 34 157 31 138 C28 119 32 98 41 80 Z" />
+            <g class="eyes">
+              <ellipse class="eye" cx="82.5" cy="135.3" rx="7.1" ry="9.8" />
+              <ellipse class="eye" cx="180.3" cy="135.2" rx="7.1" ry="9.8" />
+            </g>
+            <ellipse class="nose" cx="133" cy="151.7" rx="10" ry="7" />
+            <g class="whiskers">
+              <path d="M15 125 C25 122 39 122 50 124 C53 124.5 54 127 51 127.5 C38 126 26 126.5 16 128 C13 128 12 126 15 125 Z" />
+              <path d="M22 149 C30 146 41 143 51 142 C54 142 55 144 52 145.5 C42 147 32 150 24 152 C21 153 19 150.5 22 149 Z" />
+              <path d="M30 174 C38 168 47 162 57 158 C60 157 62 159 59 161 C49 166 40 172 32 177 C29 178 28 175.5 30 174 Z" />
+              <path d="M214 118 C225 115 238 114 248 115.5 C251 116 253 119 249 119.5 C237 119 225 120 215 121 C212 121 211 119 214 118 Z" />
+              <path d="M218 136 C227 136 237 138 244 140 C247 141 246 143 243 143 C235 141 226 140 218 140 C215 139.5 215 137 218 136 Z" />
+              <path d="M216 154 C224 156 233 160 240 164 C243 166 241 168 238 166.5 C231 163 223 160 215 158 C212 157 213 154 216 154 Z" />
+            </g>
+          </g>
 
-/* GIF STATES */
-const gifs={
-  idle:"default.gif",
-  happy:"happy.gif",
-  sleepy:"costume1.gif",
-  clingy:"sad.png",
-  bored:"bored.gif",
-  excited:"happy.gif",
-  eat:"eat.gif",
-  level3:"costume1.gif",
-  level5:"pajamas.gif",
-  level8:"princess.gif"
-};
+          <g class="bow" data-bow="pink"><use href="#kitty-ribbon" /></g>
+          <g class="bow" data-bow="blue"><use href="#kitty-ribbon" /></g>
+          <g class="bow" data-bow="star">
+            <polygon class="gold" points="182,31 190,51 212,53 195,67 200,89 182,77 164,89 169,67 152,53 174,51" />
+          </g>
+          <g class="bow" data-bow="flower">
+            <circle class="petal pink" cx="182" cy="43" r="12" />
+            <circle class="petal pink" cx="200" cy="56" r="12" />
+            <circle class="petal pink" cx="193" cy="77" r="12" />
+            <circle class="petal pink" cx="171" cy="77" r="12" />
+            <circle class="petal pink" cx="164" cy="56" r="12" />
+            <circle class="petal-core" cx="182" cy="61" r="9" />
+          </g>
 
-/* smooth gif swap */
-function setGif(name){
-  if(!gifs[name]) return;
-  const newGif=gifs[name];
-  const img=new Image();
-  img.src=newGif;
-  kitty.style.opacity=0;
-  setTimeout(()=>{
-    kitty.src=newGif;
-    kitty.style.opacity=1;
-  },300);
-}
+          <g class="accessory" data-accessory="necklace">
+            <path class="chain" d="M104 195 Q132 224 158 195" />
+            <circle class="pendant" cx="131" cy="212" r="6.5" />
+          </g>
+          <g class="accessory" data-accessory="glasses">
+            <circle class="lens" cx="82.5" cy="135.3" r="18" />
+            <circle class="lens" cx="180.3" cy="135.2" r="18" />
+            <path class="bridge" d="M100.5 135 Q131 125 162.3 135" />
+          </g>
+        </svg>
+      </button>
+    </section>
 
-function save(){localStorage.setItem("kittyState",JSON.stringify(state));}
+    <section class="bars" aria-label="Kitty stats">
+      <div class="bar">
+        <span class="bar-label">❤️ Happiness</span>
+        <div class="bar-track"><div class="bar-fill fill-happy" id="happyBar"></div></div>
+      </div>
+      <div class="bar">
+        <span class="bar-label">✨ XP</span>
+        <div class="bar-track"><div class="bar-fill fill-xp" id="xpBar"></div></div>
+      </div>
+    </section>
 
-function clamp(){
-  state.hunger=Math.max(0,Math.min(100,state.hunger));
-  state.fun=Math.max(0,Math.min(100,state.fun));
-  state.social=Math.max(0,Math.min(100,state.social));
-}
+    <section class="chat" aria-label="Chat and actions">
+      <div class="controls">
+        <input id="input" type="text" aria-label="Message Kitty" placeholder="Say something sweet…" maxlength="500" autocomplete="off" />
+        <button type="button" id="send" class="btn-primary">Send</button>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="feedBtn">🍰 Feed</button>
+        <button type="button" class="btn-ghost" id="wardrobeBtn">👗 Wardrobe</button>
+        <button type="button" class="btn-ghost" id="resetBtn">🧹 Reset</button>
+      </div>
+    </section>
+  </main>
 
-/* SWEET MOOD ENGINE */
-function updateMood(type){
-  state.mood=type;
-
-  const moods={
-    happy:"😸 Happy",
-    clingy:"🥺 Misses you",
-    sleepy:"😴 Sleepy",
-    bored:"🌸 Wants to play",
-    excited:"💖 Excited",
-    neutral:"🌷 Calm"
-  };
-
-  document.getElementById("mood").innerText=moods[type]||type;
-
-  if(type==="happy") setGif("happy");
-  if(type==="clingy") setGif("clingy");
-  if(type==="sleepy") setGif("sleepy");
-  if(type==="bored") setGif("bored");
-  if(type==="excited") setGif("excited");
-  if(type==="neutral") setGif("idle");
-}
-
-function showBubble(text){
-  bubble.innerText=text;
-  bubble.style.display="block";
-}
-
-function updateBars(){
-  document.getElementById("xpBar").style.width=state.xp+"%";
-  document.getElementById("hungerBar").style.width=state.hunger+"%";
-  document.getElementById("funBar").style.width=state.fun+"%";
-  document.getElementById("socialBar").style.width=state.social+"%";
-  document.getElementById("score").innerText=state.hearts;
-  document.getElementById("level").innerText=state.level;
-}
-setInterval(updateBars,300);
-
-function addXP(a){
-  state.xp+=a;
-  if(state.xp>=100){
-    state.xp=0;
-    state.level++;
-    showBubble("Level up 💕");
-
-    if(state.level>=8) setGif("level8");
-    else if(state.level>=5) setGif("level5");
-    else if(state.level>=3) setGif("level3");
-
-    setTimeout(()=>setGif("idle"),3000);
-  }
-}
-
-/* NEED DECAY WITHOUT ANGER */
-setInterval(()=>{
-  state.hunger-=2;
-  state.fun-=1;
-  state.social-=1;
-  clamp();
-
-  if(state.social<30) updateMood("clingy");
-  else if(state.fun<20) updateMood("bored");
-  else if(state.fun>70 && state.social>70) updateMood("happy");
-  else updateMood("neutral");
-
-  save();
-},8000);
-
-function feed(){
-  if(state.hearts<=0){showBubble("Need hearts 💔");return;}
-  state.hearts--;
-  state.hunger+=20;
-  clamp();
-
-  setGif("eat");
-  updateMood("happy");
-  showBubble("Yummy 🍰");
-
-  setTimeout(()=>setGif("idle"),2500);
-  save();
-}
-
-kitty.onclick=()=>{
-  state.hearts++;
-  state.fun+=6;
-  state.social+=4;
-  clamp();
-
-  setGif("happy");
-  addXP(10);
-  updateMood("excited");
-  state.lastInteraction=Date.now();
-
-  setTimeout(()=>setGif("idle"),2000);
-  save();
-};
-
-setInterval(()=>{
-  if(Date.now()-state.lastInteraction>25000){
-    updateMood("clingy");
-    showBubble("I miss you 🥺");
-  }
-},25000);
-
-setInterval(()=>{
-  const h=new Date().getHours();
-  if(h>=23||h<6){
-    updateMood("sleepy");
-    showBubble("Zzz dreaming 💭");
-  }
-},60000);
-
-async function sendMessage(){
-  const input=document.getElementById("input");
-  const text=input.value;
-  if(!text)return;
-  input.value="";
-  state.lastInteraction=Date.now();
-
-  showBubble("Thinking...");
-
-  try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({message:text,mood:state.mood,relationship:state.relationship})});
-    const d=await r.json();
-
-    showBubble(d.reply);
-
-    state.social+=6;
-    state.fun+=4;
-    state.relationship+=2;
-    clamp();
-
-    addXP(5);
-    save();
-  }catch{showBubble("AI error");}
-}
-</script>
+  <div class="modal" id="wardrobe" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="wardrobeTitle">
+      <header class="modal-head">
+        <h2 id="wardrobeTitle">Wardrobe</h2>
+        <button type="button" class="close" id="closeWardrobe" aria-label="Close wardrobe">✕</button>
+      </header>
+      <div class="slot">
+        <h3>Bows 🎀</h3>
+        <div class="options" data-slot="bow">
+          <button type="button" data-value="pink" class="opt">Pink</button>
+          <button type="button" data-value="blue" class="opt">Blue</button>
+          <button type="button" data-value="star" class="opt">Star</button>
+          <button type="button" data-value="flower" class="opt">Flower</button>
+          <button type="button" data-value="none" class="opt">None</button>
+        </div>
+      </div>
+      <div class="slot">
+        <h3>Outfits 👗</h3>
+        <div class="options" data-slot="outfit">
+          <button type="button" data-value="none" class="opt">None</button>
+          <button type="button" data-value="dress" class="opt">Dress</button>
+          <button type="button" data-value="overalls" class="opt">Overalls</button>
+          <button type="button" data-value="sweater" class="opt">Sweater</button>
+          <button type="button" data-value="princess" class="opt">Princess</button>
+          <button type="button" data-value="pajamas" class="opt">Pajamas</button>
+        </div>
+      </div>
+      <div class="slot">
+        <h3>Accessories ✨</h3>
+        <div class="options" data-slot="accessory">
+          <button type="button" data-value="none" class="opt">None</button>
+          <button type="button" data-value="necklace" class="opt">Necklace</button>
+          <button type="button" data-value="glasses" class="opt">Glasses</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="particle-layer" id="particles" aria-hidden="true"></div>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
